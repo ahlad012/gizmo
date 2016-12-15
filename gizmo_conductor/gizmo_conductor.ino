@@ -1,12 +1,9 @@
 #include <Servo.h>
 #include <Wire.h>
-#include <MIDI.h>
 
 #define arraySize 9
 
 int arduino_id = 1;
-
-MIDI_CREATE_DEFAULT_INSTANCE();
 
 int throttle = 0;
 Servo drone;
@@ -24,9 +21,6 @@ const int throttleArray[arraySize] = {2000, 1900, 1800, 1600, 1400, 1300, 1200, 
 
 void setup() {
   // put your setup code here, to run once:
-  MIDI.begin(MIDI_CHANNEL_OMNI);
-  MIDI.setHandleNoteOn(listen_midi);
-  
   drone.attach(9);
   drone.writeMicroseconds(throttle);
   
@@ -42,8 +36,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  MIDI.read();
-  play_note();
+  change_step();
   if (Serial.available()) {
     listen_serial();
   }
@@ -84,6 +77,7 @@ void process_note(int player_id, int targetStep, int throttleValue) {
   if (player_id == arduino_id) {
     deltaStep = targetStep - currentStep;
     throttle = throttleValue; 
+    change_throttle();
   } else {
     send_event(player_id, targetStep, throttleValue);  
   }
@@ -96,11 +90,6 @@ void send_event(int player_id, int targetStep, int throttleValue) {
   Wire.write(",");
   Wire.write(String(throttleValue).c_str());
   Wire.endTransmission();
-}
-
-void play_note() {
-  change_throttle();
-  change_step();
 }
 
 void change_step() {

@@ -30,7 +30,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  play_note();
+  change_step();
 }
 
 void receive_event(int howMany) {
@@ -45,11 +45,7 @@ void receive_event(int howMany) {
     }
   }
   throttle = s.toInt();
-}
-
-void play_note() {
   change_throttle();
-  change_step();
 }
 
 void change_step() {
